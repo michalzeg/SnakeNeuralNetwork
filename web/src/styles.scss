@@ -1,0 +1,33 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Importing Bootstrap SCSS file. */
+@import "./node_modules/bootstrap/scss/bootstrap";
+
+/* Importing Datepicker SCSS file. */
+@import "node_modules/ngx-bootstrap/datepicker/bs-datepicker";
+
+@import '~@fortawesome/fontawesome-free/css/all.css';
+
+
+.grid-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  .cell {
+    flex: 1 1 100%;
+    aspect-ratio: 1/1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &.grid-cell {
+      border: 1px solid #000;
+    }
+  }
+}
+
+.modal-dialog {
+  max-width: 80vw !important;
+}

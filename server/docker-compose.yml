@@ -1,0 +1,31 @@
+version: '3'
+services:
+  snake-neuralnetwork-trainer:
+    build:
+      context: ../
+      dockerfile: ./server/Dockerfile
+    command: ["node", "dist/server/app/trainer.js"]
+    expose:
+      - "3000"
+    scale: 4
+    restart: always
+    networks:
+      - snake-neuralnetwork
+  snake-neuralnetwork-gateway:
+    build:
+      context: ../
+      dockerfile: ./server/Dockerfile
+    command: ["node", "dist/server/app/gateway.js"]
+    ports:
+      - "3000:3001"
+    environment:
+      TRAINERS_COUNT: 4
+      TRAINER_NAME: server_snake-neuralnetwork-trainer
+      TRAINER_PORT: 3000
+    depends_on:
+      - snake-neuralnetwork-trainer
+    restart: always
+    networks:
+      - snake-neuralnetwork
+networks:
+  snake-neuralnetwork:

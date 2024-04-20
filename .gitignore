@@ -1,0 +1,6 @@
+/web/node_modules
+/training/node_modules
+/web/.angular
+/server/node_modules
+/server/dist
+/web/dist

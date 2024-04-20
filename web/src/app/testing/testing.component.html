@@ -1,0 +1,15 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <h5 class="card-header">Testing</h5>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-1"><button type="button" class="btn btn-primary" [disabled]="!isTrainingFinished || testing"
+              (click)="test()">Test</button></div>
+          <div class="col-md-1"><button type="button" class="btn btn-primary" [disabled]="!isTrainingFinished || !testing"
+                (click)="stop()">Stop</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
