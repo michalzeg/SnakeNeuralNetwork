@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { ProgressArg } from '../../../training/learning/progress';
+import { ProgressArg } from '../../../training/src/progress';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DomainService {
+export class TrainingService {
 
   private worker!: Worker;
 
@@ -20,12 +20,12 @@ export class DomainService {
   constructor() {
     if (typeof Worker !== 'undefined') {
       // Create a new
-      this.worker = new Worker(new URL('./trainer.worker', import.meta.url));
+      this.worker = new Worker(new URL('./training.worker', import.meta.url));
       this.worker.onmessage = ({ data }) => {
         this.progressSub.next(data);
       };
 
-      this.worker.onerror = (ev=>console.error("error",ev));
+      this.worker.onerror = (ev => console.error("error", ev));
 
     } else {
       alert("Cannot setup worker");

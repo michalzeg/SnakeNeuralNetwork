@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { DomainService } from '../domain.service';
+import { TrainingService } from '../training.service';
 import * as _ from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -23,7 +23,7 @@ export class TrainingComponent implements OnInit {
   snakeLengthStats: { length: number, count: number }[] = [];
 
   constructor(
-    private domainService: DomainService,
+    private domainService: TrainingService,
     private readonly detector: ChangeDetectorRef
   ) {
 

@@ -1,9 +1,11 @@
-import { Progress } from "./learning/progress";
-import { getActionIndex } from "./learning/actions";
-import { Config } from "./learning/config";
-import { Environment } from "./learning/environment";
-import { initalizeBoardArray } from "./utils/utils";
-import { Agent } from "./learning/agent";
+import { Progress } from "./src/progress";
+import { getActionIndex } from "./src/actions";
+import { Config } from "./src/config";
+import { Environment } from "./src/environment";
+import { initalizeBoardArray, wait } from "./utils/utils";
+import { Agent } from "./src/agent";
+import { ReplayBuffer } from './src/replay-buffer';
+
 
 export const startTraining = async (config: Config, modelName: string, progress: Progress): Promise<boolean> => {
 
@@ -11,52 +13,58 @@ export const startTraining = async (config: Config, modelName: string, progress:
   const boardTableProgress = initalizeBoardArray(config.environmentConfig.boardSize);
   const stateSize = environment.getStateSize();
   const agent = new Agent(config, stateSize);
+  let replayBuffer: ReplayBuffer[] = [];
 
   for (let episode = 0; episode < config.episodes; episode++) {
 
     environment.restartBoard()
 
- 
+
     // Continue taking actions (i.e., moving) until we reach a terminal state
-    let isFailed = false;
+
+    let done = false;
     let actionCount = 0;
-    while (!isFailed) {
+    while (!done) {
       actionCount++;
-      const maxActions = getMaxIteration(config.maxActionsPerIteration, environment.getSnakeLength());
-      if (actionCount > maxActions) {
-        actionCount = 0;
-        break;
-      }
+
 
       environment.copyTo(boardTableProgress);
       progress({ board: boardTableProgress, snakeLength: environment.getSnakeLength(), episode, actionCount });
 
       // Choose which action to take (i.e., where to move next)
-      const currentState = environment.getState();
-      const action = agent.getAction(currentState, episode);
-      const actionIndex = getActionIndex(action);
-      
+      const state = environment.getState();
+      const action = await agent.getAction(state, episode);
+
       // Perform the chosen action, and transition to the next state (i.e., move to the next location)
       const moveResult = environment.move(action);
-      isFailed = moveResult.isFailed;
+      done = moveResult.isFailed;
+
       // Receive the reward for moving to the new state and calculate the temporal difference
-     
+      const nextState = environment.getState();
+      const reward = moveResult.reward;
 
-      const newState = environment.getState();
 
-      const target = agent.predictReward(newState);
-      const maxQValue = Math.max(...target);
-      const value = moveResult.reward + (config.discountFactor * maxQValue);
+      const maxActions = getMaxIteration(config.maxActionsPerIteration, environment.getSnakeLength());
 
-      // Update the Q-value for the previous state and action pair
-      const targetVector = agent.predictReward(currentState);
-      targetVector[actionIndex] = value;
-      await agent.train(currentState, targetVector, () => { });
+
+      if (actionCount < maxActions) {
+        replayBuffer.push({ state, nextState, done, action, reward });
+      } else {
+        actionCount = 0;
+        done = true;
+        replayBuffer.push({ state, nextState, done, action, reward: config.environmentConfig.snakeDeadReward })
+      }
+    }
+
+
+    if (replayBuffer.length > config.minReplayBufferCapacity) {
+      await agent.train(replayBuffer);
+      replayBuffer = [];
     }
   }
 
   return true;
 };
 
-const getMaxIteration = (maxActions: number, snakeLength: number): number => maxActions * snakeLength;
+const getMaxIteration = (maxActions: number, snakeLength: number, factor = 3): number => maxActions * snakeLength * factor;
 

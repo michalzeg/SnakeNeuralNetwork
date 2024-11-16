@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { DomainService } from '../domain.service';
+import { TrainingService } from '../training.service';
 
 @Component({
   selector: 'app-testing',
@@ -13,7 +13,7 @@ export class TestingComponent implements OnInit {
   cancelRequested = false;
   testing = false;
 
-  constructor(private domainService: DomainService) { }
+  constructor(private domainService: TrainingService) { }
 
   ngOnInit(): void {
     this.domainService.trainingFinished$.subscribe(e => {

@@ -22,6 +22,7 @@ export interface Config {
   discountFactor: number;
   episodes: number;
   maxActionsPerIteration: number;
+  minReplayBufferCapacity: number;
   networkConfig: NetworkConfig;
   environmentConfig: EnvironmentConfig;
 }
@@ -29,8 +30,9 @@ export interface Config {
 export const defaultConfig: Config = {
   epsilon: 0.99,
   discountFactor: 0.9,
-  episodes: 50000,
-  maxActionsPerIteration: 100,
+  episodes: 500_000_000,
+  maxActionsPerIteration: 300,
+  minReplayBufferCapacity: 1000,
   networkConfig: {
     hidderLayers: 3,
     hiddenLayerUnits: 50,
